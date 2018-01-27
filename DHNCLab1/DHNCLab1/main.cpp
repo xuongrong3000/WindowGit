@@ -63,7 +63,7 @@ void setupViewPort() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(50.0, 1.0, 1.0, 100.0); //(degree fov, uniform aspect ratio, near, far)
-
+	                      
 	glMatrixMode(GL_MODELVIEW);  // Sử dụng ma trận ModelView - tương tác với vị trí vật thể
 	glLoadIdentity();              // Khởi tạo ma trận đơn vị (identity) hoặc xoá ma trận hiện hành thành ma trận đơn vị
 	gluLookAt(0.0, 0.0, 5.0,  // Thiết lập vị trí camera [0,0,5], 
@@ -75,14 +75,12 @@ void setupViewPort() {
 // Hàm xử lý khi thay đổi kích thước cửa sổ w, h - chiều rộng và cao của cửa sổ tính trên pixel.
 void reshapeFunc(int w, int h)
 {
-
 	if (w > h) {
 		glViewport((w - h) / 2, 0, h, h);
 	}
 	else {
 		glViewport(0, (h - w) / 2, w, w);
 	}
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(50.0, 1.0, 1.0, 100.0); //(degree fov, uniform aspect ratio, near, far)
@@ -107,6 +105,7 @@ void draw(void)
 // Hàm Xử lý sự kiện bàn phím 
 void keyboardFunc(unsigned char key, int x, int y)
 {
+	cout << "key press: " << key <<  endl;
 	switch (key)
 	{
 	case 27: // Phím Escape  (Esc)
@@ -134,29 +133,36 @@ void keyboardFunc(unsigned char key, int x, int y)
 	case '6':
 		glScalef(1.0f, 1.0f, 1.1f);
 		break;
-
+	case 'W':
 	case 'w':  // di chuyển vị trí camera tới
-		camX +=0.1f ; 
+		camX +=0.05f ; 
+	//	glLoadIdentity();
 		gluLookAt(camX, 0.0, camZ, 
-			0.0, 0.0, 0.0,		  
+			camX, 0.0, camZ,
 			0.0, 1.0, 0.0);       
 		break;
+	case 'S':
 	case 's':   // di chuyển vị trí camera lui
-		camX -= 0.1f;
+		camX -= 0.05f;
+		glLoadIdentity();
 		gluLookAt(camX, 0.0, camZ,  
-			0.0, 0.0, 0.0,		  
+			camX, 0.0, camZ,
 			0.0, 1.0, 0.0);       
 		break;
+	case 'A':
 	case 'a':   // di chuyển vị trí camera qua trái
-		camZ -= 0.1f;
+		camZ -= 0.05f;
+		glLoadIdentity();
 		gluLookAt(camX, 0.0, camZ,  
-			0.0, 0.0, 0.0,		  
+			camX, 0.0, camZ,
 			0.0, 1.0, 0.0);       
 		break;
+	case 'D':
 	case 'd':   // di chuyển vị trí camera qua phải
-		camZ += 0.1f;
+		camZ += 0.05f;
+		//glLoadIdentity();
 		gluLookAt(camX, 0.0, camZ,   
-			0.0, 0.0, 0.0,		  
+			camX, 0.0, camZ,
 			0.0, 1.0, 0.0);       
 		break;
 	default:
@@ -205,7 +211,6 @@ void mouseButton(int button, int state, int x, int y) {// (phím chuột, trạn
 		//	cout<<"mouseXY("<<x<<","<<y<<") oldMouseXY("<< oldMousePosX<<","<< oldMousePosY << ") Nha chuot rotateX="<< rotateX <<" |rotateY="<<rotateY << endl;
 		}
 		else {// vẫn đang giữ chuột 
-		//	xOrigin = x;
 			oldMousePosX = x;
 			oldMousePosY = y;
 		}
