@@ -7,10 +7,10 @@ using namespace std;
 float angle = 0.0f;
 
 // hướng nhìn của camera 
-float lx = 0.0f, lz = -1.0f;
+float camLookX = 0.0f, camLookZ = -1.0f;
 
 // toạ độ X và Z của camera 
-float x = 0.0f, z = 5.0f;
+float camX = 0.0f, camZ = 5.0f;
 
 // Biến toàn cục xác định các sự kiện chuột 
 float deltaAngle = 0.0f;
@@ -18,14 +18,27 @@ float deltaMove = 0;
 int xOrigin = -1;
 
 
-// Hàm vẽ các đối tượng.
-void draw(void)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Xoá ảnh trong buffer trước khi vẽ  //
 
-														//////////////////////////
-														// A Thiết lập ánh sáng //
-														//////////////////////////
+
+
+
+float deltaX=0.1f, deltaY=0.1f, deltaZ = 0.1f; //giá trị delta cho các phép biến đổi tịnh tiến, tỷ lệ, quay
+
+int oldMousePosX = 0, oldMousePosY = 0; //lưu toạ độ chuột click vừa rồi
+float rotateX = 0.0f, rotateY = 0.0f;   //góc xoay vật thể vật theo mouse drag
+
+void initialize()
+{
+	glEnable(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //kích hoạt bộ đệm màu sắc, bộ đệm thông tin chiều sâu
+	glEnable(GL_DEPTH_TEST);   // Kích hoạt chế độ Depth testing
+	glEnable(GL_LIGHTING);     // Kích hoạt chế độ (tính toán) ánh sáng
+	glEnable(GL_LIGHT0);       // Kích hoạt nguồn sáng #0
+
+	glClearColor(0.2, 0.2, 0.2, 1.0); //Cài đặt giá trị màu nền
+
+									  //////////////////////////
+									  // A Thiết lập ánh sáng //
+									  //////////////////////////
 
 	GLfloat Lt0diff[] = { 1.0,1.0,1.0,1.0 };  // 1. Giá trị màu của ánh sáng (RGBA) - ánh sáng trắng (đục)									
 	GLfloat Lt0pos[] = { 1.0f, 1.0f, 5.0f, 1.0f }; // 2. Vị trí của nguồn sáng
@@ -43,25 +56,6 @@ void draw(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, diffColors);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specColor);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
-
-	/////////////////////////////
-	// C Vẽ vật thể 2D hoặc 3D //
-	/////////////////////////////
-	glutSolidTeapot(1.0); // Hàm vẽ ấm trà 
-	glutSwapBuffers(); //chuyển đổi buffer và xuất ra màn hình
-}
-
-
-
-void initialize()
-{
-	glEnable(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //kích hoạt bộ đệm màu sắc, bộ đệm thông tin chiều sâu
-	glEnable(GL_DEPTH_TEST);   // Kích hoạt chế độ Depth testing
-	glEnable(GL_LIGHTING);     // Kích hoạt chế độ (tính toán) ánh sáng
-	glEnable(GL_LIGHT0);       // Kích hoạt nguồn sáng #0
-
-	glClearColor(0.2, 0.2, 0.2, 1.0); //Cài đặt giá trị màu nền
-
 }
 
 void setupViewPort() {
@@ -95,20 +89,75 @@ void reshapeFunc(int w, int h)
 	glMatrixMode(GL_MODELVIEW);
 }
 
+// Hàm vẽ các đối tượng.
+void draw(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Xoá ảnh trong buffer trước khi vẽ  //
+
+	glRotatef(rotateX, 0.0f, 1.0f, 0.0f);
+	glRotatef(rotateY, 1.0f, 0.0f, 0.0f);
+
+	/////////////////////////////
+	// C Vẽ vật thể 2D hoặc 3D //
+	/////////////////////////////
+	glutSolidTeapot(1.0); // Hàm vẽ ấm trà 
+	glutSwapBuffers(); //chuyển đổi buffer và xuất ra màn hình
+}
+
 // Hàm Xử lý sự kiện bàn phím 
 void keyboardFunc(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
 	case 27: // Phím Escape  (Esc)
-		exit(0);
+		exit(0); //thoát chương trình
 		break;
 	case 'c':
-		//////////////////////
-		//    Bài tập 2		//
-		// Thêm code xử lý  //
-		//////////////////////
+		
 		cout << "chua xu ly phim nay: " << key << "." << endl;
+		break;
+	case '1':
+		glScalef(0.9f, 1.0f, 1.0f);
+		break;
+	case '2':
+		glScalef(1.1f, 1.0f, 1.0f);
+		break;
+	case '3':
+		glScalef(1.0f, 0.9f, 1.0f);
+		break;
+	case '4':
+		glScalef(1.0f, 1.1f, 1.0f);
+		break;
+	case '5':
+		glScalef(1.0f, 1.0f, 0.9f);
+		break;
+	case '6':
+		glScalef(1.0f, 1.0f, 1.1f);
+		break;
+
+	case 'w':  // di chuyển vị trí camera tới
+		camX +=0.1f ; 
+		gluLookAt(camX, 0.0, camZ, 
+			0.0, 0.0, 0.0,		  
+			0.0, 1.0, 0.0);       
+		break;
+	case 's':   // di chuyển vị trí camera lui
+		camX -= 0.1f;
+		gluLookAt(camX, 0.0, camZ,  
+			0.0, 0.0, 0.0,		  
+			0.0, 1.0, 0.0);       
+		break;
+	case 'a':   // di chuyển vị trí camera qua trái
+		camZ -= 0.1f;
+		gluLookAt(camX, 0.0, camZ,  
+			0.0, 0.0, 0.0,		  
+			0.0, 1.0, 0.0);       
+		break;
+	case 'd':   // di chuyển vị trí camera qua phải
+		camZ += 0.1f;
+		gluLookAt(camX, 0.0, camZ,   
+			0.0, 0.0, 0.0,		  
+			0.0, 1.0, 0.0);       
 		break;
 	default:
 		cout << "chua xu ly phim nay: " << key << "." << endl;
@@ -123,22 +172,19 @@ void specialFunc(int key, int x, int y)
 	switch (key)
 	{
 	case GLUT_KEY_UP:
-		//////////////////////
-		//    Bài tập 3  	//
-		// Thêm code xử lý  //
-		//////////////////////
+		glTranslatef(0, 0, -deltaZ);
 		cout << "Phim dac biet: mui ten len" << endl;
 		break;
 	case GLUT_KEY_DOWN:
+		glTranslatef(0, 0, deltaZ);	
 		cout << "Phim dac biet: mui ten xuong" << endl;
-		// Thêm code xử lý
 		break;
 	case GLUT_KEY_LEFT:
-		// Thêm code xử lý
+		glTranslatef(-deltaX, 0, 0);
 		cout << "Phim dac biet: mui ten qua trai" << endl;
 		break;
 	case GLUT_KEY_RIGHT:
-		// Thêm code xử lý
+		glTranslatef(deltaX, 0, 0);
 		cout << "Phim dac biet: mui ten qua phai" << endl;
 		break;
 	}
@@ -148,33 +194,31 @@ void specialFunc(int key, int x, int y)
 
 void mouseButton(int button, int state, int x, int y) {// (phím chuột, trạng thái chuột, toạ độ x, toạ độ y)
 
-	if (button == GLUT_LEFT_BUTTON) { //Chuột trái
-									  //////////////////////
-									  //    Bài tập 4  	//
-									  // Thêm code xử lý  //
-									  //////////////////////
-		angle += deltaAngle;
-		xOrigin = -1;
-
+	if (button == GLUT_LEFT_BUTTON) { //Chuột trái								 
+	//	angle += deltaAngle;
+	//	xOrigin = -1;
+		
 		if (state == GLUT_UP) { //Nhả chuột
-
+			rotateX += 0.08*(float)(x - oldMousePosX);
+			rotateY += 0.08*(float)(y - oldMousePosY);
+			
+		//	cout<<"mouseXY("<<x<<","<<y<<") oldMouseXY("<< oldMousePosX<<","<< oldMousePosY << ") Nha chuot rotateX="<< rotateX <<" |rotateY="<<rotateY << endl;
 		}
 		else {// vẫn đang giữ chuột 
-			xOrigin = x;
+		//	xOrigin = x;
+			oldMousePosX = x;
+			oldMousePosY = y;
 		}
 	}
 }
 
 void mouseMove(int x, int y) { // (toạ độ x, toạ độ y) khi di chuyển chuột
-							   //////////////////////
-							   //    Bài tập 5  	//
-							   // Thêm code xử lý  //
-							   //////////////////////
+							   
 	if (xOrigin >= 0) {
 		deltaAngle = (x - xOrigin) * 0.001f;
 		// cập nhật góc nhìn của camera hoặc của người nhìn
-		lx = sin(angle + deltaAngle);
-		lz = -cos(angle + deltaAngle);
+		camLookX = sin(angle + deltaAngle);
+		camLookZ = -cos(angle + deltaAngle);
 	}
 }
 
@@ -192,7 +236,7 @@ int main(int argc, char** argv)
 
 	initialize(); //Khởi tạo các trạng thái vẽ toàn cục 
 	setupViewPort(); //thiết lập camera, khung nhìn, góc nhìn ...
-					 //glutReshapeFunc(reshapeFunc);   // Đăng ký hàm xử lý khi thay đổi kích thước cửa sổ
+	glutReshapeFunc(reshapeFunc);   // Đăng ký hàm xử lý khi thay đổi kích thước cửa sổ
 
 					 ///////////////////////////////////////////////////////////////////////////////////
 					 // Đăng ký các hàm callback (xử lý sự kiện chuột, bàn phím, thay đổi cửa sổ ...  //
